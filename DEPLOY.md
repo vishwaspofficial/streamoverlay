@@ -12,6 +12,20 @@ Add these repository secrets:
 
 ## One-time EC2 setup
 
+After allowing SSH (22), HTTP (80), and HTTPS (443) in the EC2 security group, copy the repository to the server and run the HTTPS setup script:
+
+```bash
+ssh ubuntu@13.60.95.118
+sudo apt update && sudo apt install -y git
+git clone https://github.com/vishwaspofficial/streamoverlay.git
+cd streamoverlay
+sudo bash deploy/setup-https.sh you@example.com
+```
+
+The domain must already resolve to `13.60.95.118` before Certbot runs. The script configures nginx, requests certificates for `vepo.in` and `www.vepo.in`, redirects HTTP to HTTPS, and enables automatic renewal.
+
+For manual setup without Certbot:
+
 ```bash
 sudo mkdir -p /var/www/vepo.in
 sudo chown -R "$USER":"$USER" /var/www/vepo.in
@@ -27,5 +41,5 @@ Point the `vepo.in` and `www.vepo.in` DNS A records to `13.60.95.118`. After DNS
 
 ```bash
 sudo apt install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d vepo.in -d www.vepo.in
+sudo certbot --nginx -d vepo.in -d www.vepo.in --redirect
 ```
