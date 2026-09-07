@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
   <main class="overlay-shell">
@@ -113,27 +113,6 @@
           <button class="primary-button" id="exerciseButton" type="button">Start break</button>
         </section>
 
-        <section class="controls-panel panel widget is-hidden" id="controlsPanel" data-widget="controls" aria-label="Overlay controls">
-          <div class="controls-heading">
-            <p class="eyebrow">OVERLAY CONTROLS</p>
-            <span class="key-hint">LOCAL ONLY</span>
-          </div>
-          <div class="duration-row">
-            <label for="studyMinutes">Focus minutes</label>
-            <input id="studyMinutes" type="number" min="1" max="180" value="25" aria-label="Focus minutes">
-            <button id="applyStudyMinutes" type="button">Apply</button>
-          </div>
-          <div class="duration-row">
-            <label for="sessionTotal">Total sessions</label>
-            <input id="sessionTotal" type="number" min="1" max="24" value="4" aria-label="Total study sessions">
-            <button id="applySessionTotal" type="button">Apply</button>
-          </div>
-          <div class="control-row"><span>Study session</span><button class="toggle on" id="studyToggle" type="button" aria-label="Toggle study session" aria-pressed="true"><span></span></button></div>
-          <div class="control-row"><span>Weekly goals</span><button class="toggle on" id="weekToggle" type="button" aria-label="Toggle weekly goals" aria-pressed="true"><span></span></button></div>
-          <div class="control-row"><span>Daily goals</span><button class="toggle on" id="dayToggle" type="button" aria-label="Toggle daily goals" aria-pressed="true"><span></span></button></div>
-          <div class="control-row"><span>Exercise counter</span><button class="toggle on" id="exerciseToggle" type="button" aria-label="Toggle exercise counter" aria-pressed="true"><span></span></button></div>
-          <button class="brb-button" id="brbButton" type="button">Show Be Right Back</button>
-        </section>
       </aside>
     </section>
 
@@ -143,8 +122,6 @@
       <span id="footerSession">FOCUS BLOCK 01</span>
     </footer>
 
-    <button class="show-all-button" id="controlsButton" type="button" aria-expanded="false">Show controls</button>
-
     <section class="brb-overlay is-hidden" id="brbOverlay" aria-label="Be right back screen" aria-hidden="true">
       <div class="brb-mark" aria-hidden="true"><span></span><span></span><span></span></div>
       <p class="eyebrow">FOCUS ROOM / PAUSED</p>
@@ -153,9 +130,6 @@
       <button class="brb-dismiss" id="brbDismiss" type="button">Return to stream</button>
     </section>
   </main>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-config.js"></script>
-  <script src="shared-state.js"></script>
-  <script src="script.js"></script>
+  <script src="/static/script.js"></script>
 </body>
 </html>

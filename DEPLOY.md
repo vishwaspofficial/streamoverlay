@@ -2,6 +2,8 @@
 
 This is a static 1280x720 overlay. GitHub Actions deploys the repository to `/var/www/vepo.in` on the configured Ubuntu/nginx host whenever `main` changes.
 
+The application runs as Django behind Gunicorn and nginx. Django admin is the authentication boundary: only staff users can open `/control/` or change state.
+
 The shared control page is available at `http://vepo.in/control.html`; OBS should use `http://vepo.in/`.
 
 ## Shared state setup
@@ -49,6 +51,21 @@ sudo bash deploy/setup-http.sh
 ```
 
 The domain must already resolve to `16.192.142.60`. This configures nginx at `http://vepo.in` without HTTPS or Certbot.
+
+Create the first admin user before opening `/control/`:
+
+```bash
+sudo /var/www/vepo.in/.venv/bin/python /var/www/vepo.in/manage.py createsuperuser
+```
+
+Before starting the service, replace the placeholder secret in `/etc/systemd/system/focusroom.service` with a long random value, then run:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart focusroom
+```
+
+Then use `http://vepo.in/admin/login/` to sign in, followed by `http://vepo.in/control/` for the controls.
 
 When DNSSEC is fixed later, replace the HTTP setup with:
 
