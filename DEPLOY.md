@@ -12,17 +12,23 @@ Add these repository secrets:
 
 ## One-time EC2 setup
 
-After allowing SSH (22), HTTP (80), and HTTPS (443) in the EC2 security group, copy the repository to the server and run the HTTPS setup script:
+After allowing SSH (22) and HTTP (80) in the EC2 security group, copy the repository to the server and run the HTTP-only setup script:
 
 ```bash
 ssh ubuntu@16.192.142.60
 sudo apt update && sudo apt install -y git
 git clone https://github.com/vishwaspofficial/streamoverlay.git
 cd streamoverlay
-sudo bash deploy/setup-https.sh you@example.com
+sudo bash deploy/setup-http.sh
 ```
 
-The domain must already resolve to `16.192.142.60` before Certbot runs. The script configures nginx, requests certificates for `vepo.in` and `www.vepo.in`, redirects HTTP to HTTPS, and enables automatic renewal.
+The domain must already resolve to `16.192.142.60`. This configures nginx at `http://vepo.in` without HTTPS or Certbot.
+
+When DNSSEC is fixed later, replace the HTTP setup with:
+
+```bash
+sudo bash deploy/setup-https.sh you@example.com
+```
 
 For manual setup without Certbot:
 
