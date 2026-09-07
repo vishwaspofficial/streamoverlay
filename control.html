@@ -41,6 +41,17 @@
       </div>
     </section>
     <section>
+      <h2>Overlay controls</h2>
+      <div class="row">
+        <button class="visibility" data-widget="study" type="button">Study session: on</button>
+        <button class="visibility" data-widget="weekly" type="button">Weekly goals: on</button>
+        <button class="visibility" data-widget="daily" type="button">Daily goals: on</button>
+        <button class="visibility" data-widget="exercise" type="button">Exercise counter: on</button>
+        <button id="showAll" type="button">Show all widgets</button>
+        <button id="brb" type="button">Show Be Right Back</button>
+      </div>
+    </section>
+    <section>
       <h2>Weekly goals</h2>
       <div id="weeklyGoals"></div>
       <div class="row"><input id="weeklyInput" maxlength="30" placeholder="Add weekly goal"><button id="addWeekly" type="button">Add weekly goal</button></div>
@@ -81,6 +92,30 @@
     document.querySelector('#saveTimer').addEventListener('click', () => { state.studyDuration = Number(document.querySelector('#focusMinutes').value); state.totalSessions = Number(document.querySelector('#totalSessions').value); save(); });
     document.querySelector('#addWeekly').addEventListener('click', () => { const input = document.querySelector('#weeklyInput'); if (input.value.trim()) { state.weeklyGoals.push({ text: input.value.trim(), done: false }); input.value = ''; save(); } });
     document.querySelector('#addDaily').addEventListener('click', () => { const input = document.querySelector('#dailyInput'); if (input.value.trim()) { state.dailyGoals.push({ text: input.value.trim(), done: false }); input.value = ''; save(); } });
+    const visibilityButtons = document.querySelectorAll('.visibility');
+    function renderVisibility() {
+      const visibility = state.visibility || { study: true, weekly: true, daily: true, exercise: true };
+      visibilityButtons.forEach((button) => {
+        const isVisible = visibility[button.dataset.widget] !== false;
+        button.textContent = `${button.textContent.split(':')[0]}: ${isVisible ? 'on' : 'off'}`;
+        button.dataset.on = isVisible.toString();
+      });
+      document.querySelector('#brb').textContent = state.brb ? 'Hide Be Right Back' : 'Show Be Right Back';
+    }
+    visibilityButtons.forEach((button) => button.addEventListener('click', () => {
+      state.visibility = { ...(state.visibility || {}), [button.dataset.widget]: button.dataset.on !== 'true' };
+      save();
+    }));
+    document.querySelector('#showAll').addEventListener('click', () => {
+      state.visibility = { study: true, weekly: true, daily: true, exercise: true };
+      save();
+    });
+    document.querySelector('#brb').addEventListener('click', () => {
+      state.brb = !state.brb;
+      save();
+    });
+    const originalRender = render;
+    render = () => { originalRender(); renderVisibility(); };
     window.overlaySync.start((next) => { state = { ...fallback, ...next }; render(); });
     render();
   </script>

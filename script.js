@@ -43,7 +43,14 @@ function getSharedState() {
     studyDuration: Math.round(studyDuration / 60),
     totalSessions: totalStudySessions,
     weeklyGoals: [...weeklyList.querySelectorAll('.goal-item')].map((item) => ({ text: item.querySelector('span:nth-child(2)')?.textContent || '', done: item.classList.contains('complete') })),
-    dailyGoals: [...dailyList.querySelectorAll('.goal-item')].map((item) => ({ text: item.querySelector('span:nth-child(2)')?.textContent || '', done: item.classList.contains('complete') }))
+    dailyGoals: [...dailyList.querySelectorAll('.goal-item')].map((item) => ({ text: item.querySelector('span:nth-child(2)')?.textContent || '', done: item.classList.contains('complete') })),
+    visibility: {
+      study: !studyPanel.classList.contains('is-hidden'),
+      weekly: !weekPanel.classList.contains('is-hidden'),
+      daily: !dayPanel.classList.contains('is-hidden'),
+      exercise: !exercisePanel.classList.contains('is-hidden')
+    },
+    brb: !brbOverlay.classList.contains('is-hidden')
   };
 }
 
@@ -59,6 +66,13 @@ function applySharedState(state) {
   }
   if (Array.isArray(state.weeklyGoals)) replaceGoals(weeklyList, state.weeklyGoals, wireWeeklyGoal);
   if (Array.isArray(state.dailyGoals)) replaceGoals(dailyList, state.dailyGoals, wireDailyGoal);
+  if (state.visibility) {
+    setPanelVisibility(studyPanel, state.visibility.study !== false, 'studyToggle');
+    setPanelVisibility(weekPanel, state.visibility.weekly !== false, 'weekToggle');
+    setPanelVisibility(dayPanel, state.visibility.daily !== false, 'dayToggle');
+    setPanelVisibility(exercisePanel, state.visibility.exercise !== false, 'exerciseToggle');
+  }
+  if (typeof state.brb === 'boolean') setBrbMode(state.brb);
   updateWeeklyProgress();
   updateDailyProgress();
   renderStudy();
@@ -79,6 +93,13 @@ function replaceGoals(list, goals, wireGoal) {
 
 function saveSharedState() {
   window.overlaySync?.save(getSharedState());
+}
+
+function setPanelVisibility(target, isVisible, toggleId) {
+  target.classList.toggle('is-hidden', !isVisible);
+  const toggle = document.querySelector(`#${toggleId}`);
+  toggle.classList.toggle('on', isVisible);
+  toggle.setAttribute('aria-pressed', isVisible.toString());
 }
 
 function formatTime(totalSeconds) {
@@ -285,7 +306,7 @@ function wireToggle(id, target) {
   document.querySelector(`#${id}`).addEventListener('click', (event) => {
     const isOn = event.currentTarget.classList.toggle('on');
     event.currentTarget.setAttribute('aria-pressed', isOn.toString());
-    target.classList.toggle('is-hidden', !isOn);
+    setPanelVisibility(target, isOn, id);
     saveSharedState();
   });
 }
@@ -308,7 +329,11 @@ function setBrbMode(isVisible) {
 }
 
 brbButton.addEventListener('click', () => setBrbMode(brbOverlay.classList.contains('is-hidden')));
-brbDismiss.addEventListener('click', () => setBrbMode(false));
+brbButton.addEventListener('click', saveSharedState);
+brbDismiss.addEventListener('click', () => {
+  setBrbMode(false);
+  saveSharedState();
+});
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && !brbOverlay.classList.contains('is-hidden')) setBrbMode(false);
 });
