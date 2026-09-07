@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#121417">
+  <title>Focus Room Overlay</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="overlay-shell">
+    <div class="grid-glow" aria-hidden="true"></div>
+    <header class="topbar widget" data-widget="topbar">
+      <div class="brand-lockup">
+        <span class="live-dot"></span>
+        <div>
+          <p class="eyebrow">FOCUS ROOM / LIVE</p>
+          <h1>Quiet progress.</h1>
+        </div>
+      </div>
+      <div class="topbar-meta">
+        <span id="clock">00:00</span>
+        <span class="meta-divider"></span>
+        <span>STUDY WITH ME</span>
+      </div>
+    </header>
+
+    <section class="layout" aria-label="Stream overlay">
+      <div class="main-column">
+        <section class="timer-panel panel-accent widget" data-widget="study" aria-labelledby="study-heading">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">CURRENT SESSION</p>
+              <h2 id="study-heading">Deep work block</h2>
+            </div>
+            <span class="status-chip" id="studyStatus">READY</span>
+          </div>
+          <div class="study-timer" id="studyTimer">25:00</div>
+          <div class="timer-progress"><span id="studyProgress"></span></div>
+          <div class="timer-footer">
+            <span id="sessionLabel">Session 01 / 04</span>
+            <button class="timer-action" id="studyButton" type="button">Start session</button>
+            <span id="sessionMode">Pomodoro</span>
+          </div>
+        </section>
+
+        <section class="goals-grid">
+          <article class="goal-panel panel widget" data-widget="weekly" aria-labelledby="week-heading">
+            <div class="panel-heading compact">
+              <div>
+                <p class="eyebrow">THIS WEEK</p>
+                <h2 id="week-heading">Weekly goals</h2>
+              </div>
+              <span class="goal-count" id="weekCount">3 / 6</span>
+            </div>
+            <div class="goal-ring-row">
+              <div class="goal-ring" id="weekRing"><span id="weekPercent">50%</span></div>
+              <div class="goal-copy">
+                <strong>Show up consistently</strong>
+                <span>Build the rhythm, one block at a time.</span>
+              </div>
+            </div>
+            <div class="mini-progress"><span id="weekProgress"></span></div>
+            <div class="weekly-list" id="weeklyList">
+              <div class="goal-item complete" role="button" tabindex="0"><span class="checkmark">&#10003;</span><span>Study 4 sessions</span></div>
+              <div class="goal-item complete" role="button" tabindex="0"><span class="checkmark">&#10003;</span><span>Read 100 pages</span></div>
+              <div class="goal-item" role="button" tabindex="0"><span class="checkmark"></span><span>Exercise 3 times</span></div>
+            </div>
+            <div class="add-goal-row">
+              <input id="weeklyGoalInput" type="text" maxlength="30" placeholder="New weekly goal" aria-label="New weekly goal">
+              <button id="addWeeklyGoal" type="button">Add</button>
+            </div>
+          </article>
+
+          <article class="goal-panel panel widget" data-widget="daily" aria-labelledby="day-heading">
+            <div class="panel-heading compact">
+              <div>
+                <p class="eyebrow">TODAY</p>
+                <h2 id="day-heading">Daily goals</h2>
+              </div>
+              <span class="goal-count" id="dayCount">2 / 4</span>
+            </div>
+            <div class="daily-list" id="dailyList">
+              <div class="goal-item complete" role="button" tabindex="0" data-goal="0"><span class="checkmark">&#10003;</span><span>Review notes</span></div>
+              <div class="goal-item complete" role="button" tabindex="0" data-goal="1"><span class="checkmark">&#10003;</span><span>Read 20 pages</span></div>
+              <div class="goal-item" role="button" tabindex="0" data-goal="2"><span class="checkmark"></span><span>Finish problem set</span></div>
+              <div class="goal-item" role="button" tabindex="0" data-goal="3"><span class="checkmark"></span><span>Write a recap</span></div>
+            </div>
+            <div class="add-goal-row">
+              <input id="dailyGoalInput" type="text" maxlength="30" placeholder="New daily goal" aria-label="New daily goal">
+              <button id="addDailyGoal" type="button">Add</button>
+            </div>
+          </article>
+        </section>
+      </div>
+
+      <aside class="side-column">
+        <section class="exercise-panel panel widget" id="exercisePanel" data-widget="exercise" aria-labelledby="exercise-heading">
+          <div class="panel-heading compact">
+            <div>
+              <p class="eyebrow">MOVE BREAK</p>
+              <h2 id="exercise-heading">Exercise</h2>
+            </div>
+            <span class="status-chip mint" id="exerciseStatus">READY</span>
+          </div>
+          <div class="exercise-icon" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div class="exercise-time" id="exerciseTimer">05:00</div>
+          <span class="exercise-sessions" id="exerciseSessions">Sessions completed: 0</span>
+          <p class="exercise-note">Reset your body, return sharper.</p>
+          <button class="primary-button" id="exerciseButton" type="button">Start break</button>
+        </section>
+
+        <section class="controls-panel panel widget is-hidden" id="controlsPanel" data-widget="controls" aria-label="Overlay controls">
+          <div class="controls-heading">
+            <p class="eyebrow">OVERLAY CONTROLS</p>
+            <span class="key-hint">LOCAL ONLY</span>
+          </div>
+          <div class="duration-row">
+            <label for="studyMinutes">Focus minutes</label>
+            <input id="studyMinutes" type="number" min="1" max="180" value="25" aria-label="Focus minutes">
+            <button id="applyStudyMinutes" type="button">Apply</button>
+          </div>
+          <div class="duration-row">
+            <label for="sessionTotal">Total sessions</label>
+            <input id="sessionTotal" type="number" min="1" max="24" value="4" aria-label="Total study sessions">
+            <button id="applySessionTotal" type="button">Apply</button>
+          </div>
+          <div class="control-row"><span>Study session</span><button class="toggle on" id="studyToggle" type="button" aria-label="Toggle study session" aria-pressed="true"><span></span></button></div>
+          <div class="control-row"><span>Weekly goals</span><button class="toggle on" id="weekToggle" type="button" aria-label="Toggle weekly goals" aria-pressed="true"><span></span></button></div>
+          <div class="control-row"><span>Daily goals</span><button class="toggle on" id="dayToggle" type="button" aria-label="Toggle daily goals" aria-pressed="true"><span></span></button></div>
+          <div class="control-row"><span>Exercise counter</span><button class="toggle on" id="exerciseToggle" type="button" aria-label="Toggle exercise counter" aria-pressed="true"><span></span></button></div>
+          <button class="brb-button" id="brbButton" type="button">Show Be Right Back</button>
+        </section>
+      </aside>
+    </section>
+
+    <footer class="footer-bar widget" data-widget="footer">
+      <span>ONE FOCUSED HOUR IS STILL A WIN.</span>
+      <span class="footer-rule"></span>
+      <span id="footerSession">FOCUS BLOCK 01</span>
+    </footer>
+
+    <button class="show-all-button" id="controlsButton" type="button" aria-expanded="false">Show controls</button>
+
+    <section class="brb-overlay is-hidden" id="brbOverlay" aria-label="Be right back screen" aria-hidden="true">
+      <div class="brb-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+      <p class="eyebrow">FOCUS ROOM / PAUSED</p>
+      <h2>Be right back</h2>
+      <p class="brb-caption">The next focus block starts soon.</p>
+      <button class="brb-dismiss" id="brbDismiss" type="button">Return to stream</button>
+    </section>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
