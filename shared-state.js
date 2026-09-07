@@ -1,6 +1,7 @@
 (() => {
   const config = window.OVERLAY_SUPABASE_CONFIG;
-  const hasConfig = config && !config.url.includes('YOUR_PROJECT') && !config.anonKey.includes('YOUR_SUPABASE');
+  const apiKey = config?.publishableKey || config?.anonKey || '';
+  const hasConfig = config && !config.url.includes('YOUR_PROJECT') && !apiKey.includes('YOUR_') && !apiKey.includes('YOUR_SUPABASE');
 
   window.overlaySync = {
     enabled: Boolean(hasConfig),
@@ -9,7 +10,7 @@
     channel: null,
     async start(onState) {
       if (!hasConfig || !window.supabase) return;
-      this.client = window.supabase.createClient(config.url, config.anonKey);
+      this.client = window.supabase.createClient(config.url, apiKey);
       const { data } = await this.client.from('overlay_state').select('state').eq('id', 'main').maybeSingle();
       if (data?.state) {
         this.state = data.state;

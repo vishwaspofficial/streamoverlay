@@ -8,7 +8,7 @@ The shared control page is available at `http://vepo.in/control.html`; OBS shoul
 
 1. Create a Supabase project.
 2. Open the Supabase SQL Editor and run `supabase-schema.sql` from this repository.
-3. In Supabase Project Settings -> API, copy the Project URL and the public anon key.
+3. In Supabase Project Settings -> API, copy the Project URL and the public publishable key.
 4. On EC2, create the ignored runtime config:
 
 ```bash
@@ -22,11 +22,11 @@ Set the file contents to:
 ```js
 window.OVERLAY_SUPABASE_CONFIG = {
 	url: 'https://YOUR_PROJECT.supabase.co',
-	anonKey: 'YOUR_SUPABASE_ANON_KEY'
+	publishableKey: 'sb_publishable_YOUR_KEY'
 };
 ```
 
-`supabase-config.js` is intentionally excluded from GitHub and from the deployment sync, so future CI/CD deployments preserve it on EC2. The public anon key is designed for browser use; never put a Supabase service-role key in this file.
+`supabase-config.js` is intentionally excluded from GitHub and from the deployment sync, so future CI/CD deployments preserve it on EC2. A publishable key is designed for browser use; never put a Supabase secret or service-role key in this file.
 
 ## GitHub Actions secrets
 
