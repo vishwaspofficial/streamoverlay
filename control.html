@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Focus Room Controls</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: dark; --bg:#121417; --panel:#202528; --line:#3c4646; --text:#e8ece2; --muted:#9ba59e; --amber:#f0ae56; --mint:#a8d8b8; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; padding:42px; color:var(--text); background:#101214; font:14px "Space Grotesk",sans-serif; }
+    main { width:min(720px,100%); margin:auto; }
+    h1 { margin:0 0 8px; font-size:30px; }
+    .intro { margin:0 0 28px; color:var(--muted); }
+    section { margin-top:18px; padding:22px; border:1px solid var(--line); background:var(--panel); }
+    h2 { margin:0 0 16px; font-size:18px; }
+    label { display:grid; gap:7px; color:var(--muted); font-size:12px; }
+    .row { display:flex; flex-wrap:wrap; gap:12px; align-items:end; }
+    input, button { padding:10px 12px; border:1px solid var(--line); color:var(--text); background:#15191b; font:inherit; }
+    input { min-width:220px; }
+    button { color:var(--amber); border-color:var(--amber); cursor:pointer; }
+    button:hover { color:#121417; background:var(--amber); }
+    .goal { display:flex; align-items:center; gap:10px; margin:9px 0; }
+    .goal span { flex:1; }
+    .goal button { padding:5px 8px; border-color:var(--line); color:var(--muted); }
+    .status { margin-top:18px; color:var(--mint); font:12px "DM Mono",monospace; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Focus Room Controls</h1>
+    <p class="intro">Changes here sync to every open overlay and OBS browser source.</p>
+    <section>
+      <h2>Timer settings</h2>
+      <div class="row">
+        <label>Focus minutes<input id="focusMinutes" type="number" min="1" max="180" value="25"></label>
+        <label>Total study sessions<input id="totalSessions" type="number" min="1" max="24" value="4"></label>
+        <button id="saveTimer" type="button">Save timer settings</button>
+      </div>
+    </section>
+    <section>
+      <h2>Weekly goals</h2>
+      <div id="weeklyGoals"></div>
+      <div class="row"><input id="weeklyInput" maxlength="30" placeholder="Add weekly goal"><button id="addWeekly" type="button">Add weekly goal</button></div>
+    </section>
+    <section>
+      <h2>Daily goals</h2>
+      <div id="dailyGoals"></div>
+      <div class="row"><input id="dailyInput" maxlength="30" placeholder="Add daily goal"><button id="addDaily" type="button">Add daily goal</button></div>
+    </section>
+    <div class="status" id="status">Connecting shared state...</div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="shared-state.js"></script>
+  <script>
+    const fallback = { studyDuration: 25, totalSessions: 4, weeklyGoals: [{ text: 'Study 4 sessions', done: true }, { text: 'Read 100 pages', done: true }, { text: 'Exercise 3 times', done: false }], dailyGoals: [{ text: 'Review notes', done: true }, { text: 'Read 20 pages', done: true }, { text: 'Finish problem set', done: false }, { text: 'Write a recap', done: false }] };
+    let state = { ...fallback };
+    const status = document.querySelector('#status');
+    function render() {
+      document.querySelector('#focusMinutes').value = state.studyDuration || 25;
+      document.querySelector('#totalSessions').value = state.totalSessions || 4;
+      renderGoals('weeklyGoals', state.weeklyGoals || [], 'weekly');
+      renderGoals('dailyGoals', state.dailyGoals || [], 'daily');
+      status.textContent = window.overlaySync.enabled ? 'Connected. Changes sync live.' : 'Add Supabase config to enable shared sync.';
+    }
+    function renderGoals(id, goals, kind) {
+      const host = document.querySelector(`#${id}`);
+      host.innerHTML = '';
+      goals.forEach((goal, index) => {
+        const row = document.createElement('div'); row.className = 'goal';
+        row.innerHTML = `<span>${goal.done ? '✓ ' : ''}${goal.text}</span><button type="button">${goal.done ? 'Undo' : 'Done'}</button><button type="button">Delete</button>`;
+        row.children[1].addEventListener('click', () => { state[`${kind}Goals`][index].done = !goal.done; save(); });
+        row.children[2].addEventListener('click', () => { state[`${kind}Goals`].splice(index, 1); save(); });
+        host.appendChild(row);
+      });
+    }
+    async function save() { await window.overlaySync.save(state); render(); }
+    document.querySelector('#saveTimer').addEventListener('click', () => { state.studyDuration = Number(document.querySelector('#focusMinutes').value); state.totalSessions = Number(document.querySelector('#totalSessions').value); save(); });
+    document.querySelector('#addWeekly').addEventListener('click', () => { const input = document.querySelector('#weeklyInput'); if (input.value.trim()) { state.weeklyGoals.push({ text: input.value.trim(), done: false }); input.value = ''; save(); } });
+    document.querySelector('#addDaily').addEventListener('click', () => { const input = document.querySelector('#dailyInput'); if (input.value.trim()) { state.dailyGoals.push({ text: input.value.trim(), done: false }); input.value = ''; save(); } });
+    window.overlaySync.start((next) => { state = { ...fallback, ...next }; render(); });
+    render();
+  </script>
+</body>
+</html>

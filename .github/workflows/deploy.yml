@@ -29,6 +29,7 @@ jobs:
           rsync --archive --delete --verbose \
             --exclude ".git/" \
             --exclude ".github/" \
+            --exclude "supabase-config.js" \
             ./ "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/var/www/vepo.in/"
 
       - name: Reload nginx

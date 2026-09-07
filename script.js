@@ -38,6 +38,49 @@ const sessionTotal = document.querySelector('#sessionTotal');
 const applySessionTotal = document.querySelector('#applySessionTotal');
 const exerciseSessions = document.querySelector('#exerciseSessions');
 
+function getSharedState() {
+  return {
+    studyDuration: Math.round(studyDuration / 60),
+    totalSessions: totalStudySessions,
+    weeklyGoals: [...weeklyList.querySelectorAll('.goal-item')].map((item) => ({ text: item.querySelector('span:nth-child(2)')?.textContent || '', done: item.classList.contains('complete') })),
+    dailyGoals: [...dailyList.querySelectorAll('.goal-item')].map((item) => ({ text: item.querySelector('span:nth-child(2)')?.textContent || '', done: item.classList.contains('complete') }))
+  };
+}
+
+function applySharedState(state) {
+  if (state.studyDuration) {
+    studyDuration = Number(state.studyDuration) * 60;
+    studySeconds = studyDuration;
+    studyMinutes.value = state.studyDuration;
+  }
+  if (state.totalSessions) {
+    totalStudySessions = Number(state.totalSessions);
+    sessionTotal.value = totalStudySessions;
+  }
+  if (Array.isArray(state.weeklyGoals)) replaceGoals(weeklyList, state.weeklyGoals, wireWeeklyGoal);
+  if (Array.isArray(state.dailyGoals)) replaceGoals(dailyList, state.dailyGoals, wireDailyGoal);
+  updateWeeklyProgress();
+  updateDailyProgress();
+  renderStudy();
+}
+
+function replaceGoals(list, goals, wireGoal) {
+  list.innerHTML = '';
+  goals.forEach((goal) => {
+    const item = document.createElement('div');
+    item.className = `goal-item${goal.done ? ' complete' : ''}`;
+    item.setAttribute('role', 'button');
+    item.setAttribute('tabindex', '0');
+    item.innerHTML = `<span class="checkmark">${goal.done ? '&#10003;' : ''}</span><span>${goal.text}</span>`;
+    list.appendChild(item);
+    wireGoal(item);
+  });
+}
+
+function saveSharedState() {
+  window.overlaySync?.save(getSharedState());
+}
+
 function formatTime(totalSeconds) {
   const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
   const seconds = (totalSeconds % 60).toString().padStart(2, '0');
@@ -114,6 +157,7 @@ applyStudyMinutes.addEventListener('click', () => {
   clearInterval(studyInterval);
   studyStatus.textContent = 'READY';
   renderStudy();
+  saveSharedState();
 });
 
 applySessionTotal.addEventListener('click', () => {
@@ -122,6 +166,7 @@ applySessionTotal.addEventListener('click', () => {
   totalStudySessions = Math.round(sessions);
   completedStudySessions = Math.min(completedStudySessions, totalStudySessions);
   renderStudy();
+  saveSharedState();
 });
 
 exerciseButton.addEventListener('click', () => {
@@ -143,6 +188,7 @@ function wireDailyGoal(item) {
     item.classList.toggle('complete');
     item.querySelector('.checkmark').innerHTML = item.classList.contains('complete') ? '&#10003;' : '';
     updateDailyProgress();
+      saveSharedState();
   };
   item.addEventListener('click', toggleGoal);
   item.addEventListener('keydown', (event) => {
@@ -162,6 +208,7 @@ function addDeleteButton(item, updateProgress) {
     event.stopPropagation();
     item.remove();
     updateProgress();
+    saveSharedState();
   };
   deleteButton.addEventListener('click', deleteGoal);
   deleteButton.addEventListener('keydown', (event) => {
@@ -182,6 +229,7 @@ addDailyGoal.addEventListener('click', () => {
   wireDailyGoal(item);
   dailyGoalInput.value = '';
   updateDailyProgress();
+  saveSharedState();
 });
 dailyGoalInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') addDailyGoal.click();
@@ -204,6 +252,7 @@ function wireWeeklyGoal(item) {
     item.classList.toggle('complete');
     item.querySelector('.checkmark').innerHTML = item.classList.contains('complete') ? '&#10003;' : '';
     updateWeeklyProgress();
+    saveSharedState();
   };
   item.addEventListener('click', toggleGoal);
   item.addEventListener('keydown', (event) => {
@@ -225,6 +274,7 @@ addWeeklyGoal.addEventListener('click', () => {
   wireWeeklyGoal(item);
   weeklyGoalInput.value = '';
   updateWeeklyProgress();
+  saveSharedState();
 });
 weeklyGoalInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') addWeeklyGoal.click();
@@ -236,6 +286,7 @@ function wireToggle(id, target) {
     const isOn = event.currentTarget.classList.toggle('on');
     event.currentTarget.setAttribute('aria-pressed', isOn.toString());
     target.classList.toggle('is-hidden', !isOn);
+    saveSharedState();
   });
 }
 
@@ -324,3 +375,4 @@ setInterval(updateClock, 1000);
 updateClock();
 renderStudy();
 renderExercise();
+window.overlaySync?.start(applySharedState);
